@@ -2,7 +2,7 @@ mod state;
 
 use clap::Parser;
 use state::{Action, State};
-use std::io::{self, Write};
+use std::io::{stdin, stdout, BufWriter, Write};
 
 #[derive(Parser)]
 struct Args;
@@ -13,13 +13,14 @@ fn main() -> anyhow::Result<()> {
 
 fn repl(Args {}: Args) -> anyhow::Result<()> {
     let mut state = State::new();
-    let stdin = io::stdin();
+    let (stdin, mut stdout) = (stdin(), BufWriter::new(stdout()));
     let mut input = String::new();
 
     loop {
-        print!("{state}");
-        io::stdout().flush().unwrap();
+        state.output(&mut stdout)?;
+        stdout.flush()?;
         stdin.read_line(&mut input).unwrap();
+
         if let Action::Terminate(result) = state.process(&input) {
             break result;
         }
