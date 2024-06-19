@@ -5,6 +5,7 @@ use std::io::Write;
 
 pub enum Action {
     Continue,
+    #[allow(dead_code)]
     Terminate(anyhow::Result<()>),
 }
 
@@ -32,7 +33,7 @@ impl State {
     }
 
     pub fn process(&mut self, input: &str) -> Action {
-        let (command, args) = input.split_once([' ', '\t', '\n']).unwrap_or((input, ""));
+        let (command, _args) = input.split_once([' ', '\t', '\n']).unwrap_or((input, ""));
         self.command = Command::search(command);
         Action::Continue
     }
