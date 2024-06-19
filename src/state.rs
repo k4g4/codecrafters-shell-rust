@@ -1,7 +1,7 @@
 mod command;
 
 use super::Action;
-use command::{Command, Exit, NotFound};
+use command::{Command, Echo, Exit, NotFound};
 use std::io::Write;
 
 struct Settings {
@@ -33,10 +33,19 @@ impl State {
 
             CommandState::Command(command) => match command {
                 Command::NotFound(NotFound { invalid }) => {
-                    writeln!(writer, "{invalid}: command not found")?
+                    writeln!(writer, "{invalid}: command not found")?;
                 }
 
                 Command::Exit(_) => unreachable!("should have exited before reaching here"),
+
+                Command::Echo(Echo { message }) => {
+                    if !message.is_empty() {
+                        for word in &message[..message.len() - 1] {
+                            write!(writer, "{word} ")?;
+                        }
+                        writeln!(writer, "{}", message.last().unwrap())?;
+                    }
+                }
             },
 
             CommandState::Error(error) => writeln!(writer, "{error}")?,

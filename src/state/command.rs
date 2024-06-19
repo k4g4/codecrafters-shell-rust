@@ -1,6 +1,5 @@
 use clap::Parser;
 
-#[derive(Parser)]
 pub struct NotFound {
     pub invalid: String,
 }
@@ -11,9 +10,15 @@ pub struct Exit {
     pub code: i32,
 }
 
+#[derive(Parser)]
+pub struct Echo {
+    pub message: Vec<String>,
+}
+
 pub enum Command {
     NotFound(NotFound),
     Exit(Exit),
+    Echo(Echo),
 }
 
 impl Command {
@@ -28,6 +33,8 @@ impl Command {
             "" => Ok(None),
 
             "exit" => Ok(Some(Self::Exit(Exit::try_parse_from(command)?))),
+
+            "echo" => Ok(Some(Self::Echo(Echo::try_parse_from(command)?))),
 
             _ => Ok(Some(Self::NotFound(NotFound {
                 invalid: command_name.into(),
