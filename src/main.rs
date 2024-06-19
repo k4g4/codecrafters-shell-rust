@@ -1,8 +1,19 @@
 mod state;
 
 use clap::Parser;
-use state::{Action, State};
-use std::io::{stdin, stdout, BufWriter, Write};
+use state::State;
+use std::{
+    io::{stdin, stdout, BufWriter, Write},
+    process::exit,
+};
+
+pub enum Action {
+    Continue,
+    Terminate {
+        code: i32,
+        result: anyhow::Result<()>,
+    },
+}
 
 #[derive(Parser)]
 struct Args;
@@ -21,8 +32,11 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
         stdout.flush()?;
         input.clear();
         stdin.read_line(&mut input)?;
-        if let Action::Terminate(result) = state.process(&input) {
-            break result;
+        if let Action::Terminate { code, result } = state.process(&input) {
+            if let Err(error) = result {
+                eprintln!("{error}");
+            }
+            exit(code);
         }
     }
 }
