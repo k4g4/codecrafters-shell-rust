@@ -19,8 +19,8 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
     loop {
         state.output(&mut stdout)?;
         stdout.flush()?;
-        stdin.read_line(&mut input).unwrap();
-
+        input.clear();
+        stdin.read_line(&mut input)?;
         if let Action::Terminate(result) = state.process(&input) {
             break result;
         }
