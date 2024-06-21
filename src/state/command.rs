@@ -71,11 +71,18 @@ impl Command {
             )))),
 
             _ => {
-                let es = executables
-                    .iter()
-                    .map(|e| (e.path().parent().unwrap().to_owned(), e.file_name()))
-                    .collect::<std::collections::HashMap<_, _>>();
-                println!("{} {es:?}", std::env::var("PATH")?);
+                for path in std::env::var("PATH")?.split(':') {
+                    if let Ok(read_dir) = std::fs::read_dir(path) {
+                        println!("{path} is ok");
+                        for entry in read_dir {
+                            print!("{} ", entry?.file_name().to_string_lossy());
+                        }
+                        println!();
+                    } else {
+                        println!("{path} is ERR");
+                    }
+                }
+
                 if let Some(executable) = executables
                     .iter()
                     .find(|exec| exec.file_name() == command_name)
