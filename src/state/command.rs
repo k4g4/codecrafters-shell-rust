@@ -73,10 +73,8 @@ impl Command {
             _ => {
                 let es = executables
                     .iter()
-                    .filter_map(|e| {
-                        (e.path().to_string_lossy().contains("tmp")).then(|| e.file_name())
-                    })
-                    .collect::<Vec<_>>();
+                    .map(|e| (e.path().parent().unwrap().to_owned(), e.file_name()))
+                    .collect::<std::collections::HashMap<_, _>>();
                 println!("{es:?}");
                 if let Some(executable) = executables
                     .iter()
