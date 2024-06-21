@@ -29,8 +29,14 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
         .flat_map(fs::read_dir)
         .flatten()
         .collect::<Result<_, _>>()?;
-    for path in env::var("PATH")?.split(':') {
-        eprintln!("{path}");
+
+    let path = env::var("PATH")?
+        .split(':')
+        .find(|path| path.contains("tmp"))
+        .unwrap()
+        .to_owned();
+    for entry in fs::read_dir(path)? {
+        eprintln!("{}", entry?.file_name().to_string_lossy());
     }
 
     let mut state = State::new(executables);
