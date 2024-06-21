@@ -15,10 +15,27 @@ pub struct Echo {
     pub message: Vec<String>,
 }
 
+pub enum Type {
+    Builtin(String),
+    NotFound(String),
+    None,
+}
+
+impl Type {
+    fn new(command: Option<&str>) -> Self {
+        match command {
+            None => Self::None,
+            Some("echo" | "exit" | "type") => Self::Builtin(command.unwrap().into()),
+            Some(_) => Self::NotFound(command.unwrap().into()),
+        }
+    }
+}
+
 pub enum Command {
     NotFound(NotFound),
     Exit(Exit),
     Echo(Echo),
+    Type(Type),
 }
 
 impl Command {
@@ -35,6 +52,8 @@ impl Command {
             "exit" => Ok(Some(Self::Exit(Exit::try_parse_from(command)?))),
 
             "echo" => Ok(Some(Self::Echo(Echo::try_parse_from(command)?))),
+
+            "type" => Ok(Some(Self::Type(Type::new(command.skip(1).next())))),
 
             _ => Ok(Some(Self::NotFound(NotFound {
                 invalid: command_name.into(),

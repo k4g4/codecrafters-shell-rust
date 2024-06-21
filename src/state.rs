@@ -1,7 +1,7 @@
 mod command;
 
 use super::Action;
-use command::{Command, Echo, Exit, NotFound};
+use command::{Command, Echo, Exit, NotFound, Type};
 use std::io::Write;
 
 struct Settings {
@@ -46,6 +46,12 @@ impl State {
                         writeln!(writer, "{}", message.last().unwrap())?;
                     }
                 }
+
+                Command::Type(r#type) => match r#type {
+                    Type::Builtin(command) => writeln!(writer, "{command} is a shell builtin")?,
+                    Type::NotFound(command) => writeln!(writer, "{command}: not found")?,
+                    Type::None => {}
+                },
             },
 
             CommandState::Error(error) => writeln!(writer, "{error}")?,
