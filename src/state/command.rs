@@ -34,7 +34,7 @@ impl Type {
     fn new(command: Option<&str>, executables: &[DirEntry]) -> Self {
         match command {
             None => Self::None,
-            Some("echo" | "exit" | "type") => Self::Builtin(command.unwrap().into()),
+            Some("echo" | "exit" | "pwd" | "type") => Self::Builtin(command.unwrap().into()),
             Some(command) => {
                 if let Some(executable) =
                     executables.iter().find(|exec| exec.file_name() == command)
