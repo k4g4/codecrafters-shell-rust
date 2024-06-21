@@ -24,11 +24,17 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn repl(Args {}: Args) -> anyhow::Result<()> {
-    let executables: Vec<_> = env::var("PATH")?
-        .split(':')
-        .flat_map(fs::read_dir)
-        .flatten()
-        .collect::<Result<_, _>>()?;
+    let executables = {
+        let mut execs = vec![];
+        for path in env::var("PATH")?.split(':') {
+            if let Ok(read_dir) = fs::read_dir(path) {
+                for entry in read_dir {
+                    execs.push(entry?);
+                }
+            }
+        }
+        execs
+    };
 
     let mut state = State::new(executables);
     let (stdin, mut stdout) = (stdin(), BufWriter::new(stdout()));
