@@ -60,9 +60,8 @@ impl Command {
 
         let executables = {
             let mut execs = vec![];
-            for path in env::var("PATH")?.split(':').take(2) {
+            for path in env::var("PATH")?.split(':') {
                 if let Ok(read_dir) = fs::read_dir(path) {
-                    println!("{path} is ok");
                     for entry in read_dir {
                         execs.push(entry?);
                     }
