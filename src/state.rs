@@ -2,10 +2,9 @@ mod command;
 
 use super::Action;
 use command::{Command, Echo, Exit, NotFound, Type};
-use std::{fs::DirEntry, io::Write, process};
+use std::{io::Write, process};
 
 struct Settings {
-    executables: Vec<DirEntry>,
     prompt: String,
 }
 
@@ -21,12 +20,9 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(executables: Vec<DirEntry>) -> Self {
+    pub fn new() -> Self {
         Self {
-            settings: Settings {
-                executables,
-                prompt: "$".into(),
-            },
+            settings: Settings { prompt: "$".into() },
             command_state: CommandState::Empty,
         }
     }
@@ -76,7 +72,7 @@ impl State {
     }
 
     pub fn process(&mut self, input: &str) -> Action {
-        match Command::search(input, &self.settings.executables) {
+        match Command::search(input) {
             Ok(None) => {
                 self.command_state = CommandState::Empty;
                 Action::Continue

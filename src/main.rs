@@ -3,7 +3,6 @@ mod state;
 use clap::Parser;
 use state::State;
 use std::{
-    env, fs,
     io::{stdin, stdout, BufWriter, Write},
     process::exit,
 };
@@ -24,19 +23,7 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn repl(Args {}: Args) -> anyhow::Result<()> {
-    let executables = {
-        let mut execs = vec![];
-        for path in env::var("PATH")?.split(':') {
-            if let Ok(read_dir) = fs::read_dir(path) {
-                for entry in read_dir {
-                    execs.push(entry?);
-                }
-            }
-        }
-        execs
-    };
-
-    let mut state = State::new(executables);
+    let mut state = State::new();
     let (stdin, mut stdout) = (stdin(), BufWriter::new(stdout()));
     let mut input = String::new();
 

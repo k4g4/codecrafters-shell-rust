@@ -1,4 +1,8 @@
-use std::{fs::DirEntry, path::PathBuf};
+use std::{
+    env,
+    fs::{self, DirEntry},
+    path::PathBuf,
+};
 
 use clap::Parser;
 
@@ -51,8 +55,21 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn search(command: &str, executables: &[DirEntry]) -> anyhow::Result<Option<Self>> {
+    pub fn search(command: &str) -> anyhow::Result<Option<Self>> {
         const WHITESPACE: [char; 2] = [' ', '\t'];
+
+        let executables = {
+            let mut execs = vec![];
+            for path in env::var("PATH")?.split(':').take(2) {
+                if let Ok(read_dir) = fs::read_dir(path) {
+                    println!("{path} is ok");
+                    for entry in read_dir {
+                        execs.push(entry?);
+                    }
+                }
+            }
+            execs
+        };
 
         let command = command.trim();
         let (command_name, _) = command.split_once(WHITESPACE).unwrap_or((command, ""));
@@ -67,22 +84,10 @@ impl Command {
 
             "type" => Ok(Some(Self::Type(Type::new(
                 command.skip(1).next(),
-                executables,
+                &executables,
             )))),
 
             _ => {
-                for path in std::env::var("PATH")?.split(':').take(2) {
-                    if let Ok(read_dir) = std::fs::read_dir(path) {
-                        println!("{path} is ok");
-                        for entry in read_dir {
-                            print!("{} ", entry?.path().display());
-                        }
-                        println!();
-                    } else {
-                        println!("{path} is ERR");
-                    }
-                }
-
                 if let Some(executable) = executables
                     .iter()
                     .find(|exec| exec.file_name() == command_name)
