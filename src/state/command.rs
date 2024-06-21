@@ -71,6 +71,13 @@ impl Command {
             )))),
 
             _ => {
+                let es = executables
+                    .iter()
+                    .filter_map(|e| {
+                        (e.path().to_string_lossy().contains("tmp")).then(|| e.file_name())
+                    })
+                    .collect::<Vec<_>>();
+                println!("{es:?}");
                 if let Some(executable) = executables
                     .iter()
                     .find(|exec| exec.file_name() == command_name)
