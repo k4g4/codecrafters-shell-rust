@@ -2,9 +2,10 @@ mod command;
 
 use super::Action;
 use command::{Command, Echo, Exit, NotFound, Type};
-use std::io::Write;
+use std::{fs::DirEntry, io::Write};
 
 struct Settings {
+    executables: Vec<DirEntry>,
     prompt: String,
 }
 
@@ -20,9 +21,12 @@ pub struct State {
 }
 
 impl State {
-    pub fn new() -> Self {
+    pub fn new(executables: Vec<DirEntry>) -> Self {
         Self {
-            settings: Settings { prompt: "$".into() },
+            settings: Settings {
+                executables,
+                prompt: "$".into(),
+            },
             command_state: CommandState::Empty,
         }
     }
@@ -50,6 +54,9 @@ impl State {
                 Command::Type(r#type) => match r#type {
                     Type::Builtin(command) => writeln!(writer, "{command} is a shell builtin")?,
                     Type::NotFound(command) => writeln!(writer, "{command}: not found")?,
+                    Type::Path(command, path) => {
+                        writeln!(writer, "{command} is {}", path.display())?
+                    }
                     Type::None => {}
                 },
             },
@@ -61,7 +68,7 @@ impl State {
     }
 
     pub fn process(&mut self, input: &str) -> Action {
-        match Command::search(input) {
+        match Command::search(input, &self.settings.executables) {
             Ok(None) => {
                 self.command_state = CommandState::Empty;
                 Action::Continue
