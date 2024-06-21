@@ -71,6 +71,10 @@ impl Command {
             )))),
 
             _ => {
+                eprintln!("{command_name}");
+                for exec in executables {
+                    eprintln!("{}", exec.path().display());
+                }
                 if let Some(executable) = executables
                     .iter()
                     .find(|exec| exec.file_name() == command_name)
