@@ -30,6 +30,7 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
         .flatten()
         .collect::<Result<_, _>>()?;
 
+    eprintln!("{}", env::var("PATH")?);
     let path = env::var("PATH")?
         .split(':')
         .find(|path| path.contains("tmp"))
