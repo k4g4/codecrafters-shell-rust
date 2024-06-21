@@ -30,9 +30,8 @@ impl Type {
             None => Self::None,
             Some("echo" | "exit" | "type") => Self::Builtin(command.unwrap().into()),
             Some(command) => {
-                if let Some(executable) = executables
-                    .iter()
-                    .find(|executable| executable.file_name() == command)
+                if let Some(executable) =
+                    executables.iter().find(|exec| exec.file_name() == command)
                 {
                     Self::Path(command.into(), executable.path())
                 } else {
@@ -48,6 +47,7 @@ pub enum Command {
     Exit(Exit),
     Echo(Echo),
     Type(Type),
+    Path(PathBuf, Vec<String>),
 }
 
 impl Command {
@@ -70,9 +70,21 @@ impl Command {
                 executables,
             )))),
 
-            _ => Ok(Some(Self::NotFound(NotFound {
-                invalid: command_name.into(),
-            }))),
+            _ => {
+                if let Some(executable) = executables
+                    .iter()
+                    .find(|exec| exec.file_name() == command_name)
+                {
+                    Ok(Some(Self::Path(
+                        executable.path(),
+                        command.skip(1).map(Into::into).collect(),
+                    )))
+                } else {
+                    Ok(Some(Self::NotFound(NotFound {
+                        invalid: command_name.into(),
+                    })))
+                }
+            }
         }
     }
 }

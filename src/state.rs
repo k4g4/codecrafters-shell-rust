@@ -2,7 +2,7 @@ mod command;
 
 use super::Action;
 use command::{Command, Echo, Exit, NotFound, Type};
-use std::{fs::DirEntry, io::Write};
+use std::{fs::DirEntry, io::Write, process};
 
 struct Settings {
     executables: Vec<DirEntry>,
@@ -59,6 +59,14 @@ impl State {
                     }
                     Type::None => {}
                 },
+
+                Command::Path(path, args) => writeln!(
+                    writer,
+                    "{}",
+                    String::from_utf8_lossy(
+                        &process::Command::new(path).args(args).output()?.stdout
+                    )
+                )?,
             },
 
             CommandState::Error(error) => writeln!(writer, "{error}")?,
