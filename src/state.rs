@@ -2,7 +2,7 @@ mod command;
 
 use super::Action;
 use command::{Command, Echo, Exit, NotFound, Type};
-use std::{io::Write, process};
+use std::{env, io::Write, process};
 
 struct Settings {
     prompt: String,
@@ -46,6 +46,8 @@ impl State {
                         writeln!(writer, "{}", message.last().unwrap())?;
                     }
                 }
+
+                Command::Pwd(_) => writeln!(writer, "{}", env::current_dir()?.display())?,
 
                 Command::Type(r#type) => match r#type {
                     Type::Builtin(command) => writeln!(writer, "{command} is a shell builtin")?,

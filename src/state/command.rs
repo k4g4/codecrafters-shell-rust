@@ -21,6 +21,8 @@ pub struct Echo {
     pub message: Vec<String>,
 }
 
+pub struct Pwd;
+
 pub enum Type {
     Builtin(String),
     Path(String, PathBuf),
@@ -50,6 +52,7 @@ pub enum Command {
     NotFound(NotFound),
     Exit(Exit),
     Echo(Echo),
+    Pwd(Pwd),
     Type(Type),
     Path(PathBuf, Vec<String>),
 }
@@ -80,6 +83,8 @@ impl Command {
             "exit" => Ok(Some(Self::Exit(Exit::try_parse_from(command)?))),
 
             "echo" => Ok(Some(Self::Echo(Echo::try_parse_from(command)?))),
+
+            "pwd" => Ok(Some(Self::Pwd(Pwd))),
 
             "type" => Ok(Some(Self::Type(Type::new(
                 command.skip(1).next(),
