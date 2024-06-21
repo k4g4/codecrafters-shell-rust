@@ -30,16 +30,6 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
         .flatten()
         .collect::<Result<_, _>>()?;
 
-    eprintln!("{}", env::var("PATH")?);
-    let path = env::var("PATH")?
-        .split(':')
-        .find(|path| path.contains("tmp"))
-        .unwrap()
-        .to_owned();
-    for entry in fs::read_dir(path)? {
-        eprintln!("{}", entry?.file_name().to_string_lossy());
-    }
-
     let mut state = State::new(executables);
     let (stdin, mut stdout) = (stdin(), BufWriter::new(stdout()));
     let mut input = String::new();
