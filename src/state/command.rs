@@ -75,7 +75,7 @@ impl Command {
                     .iter()
                     .map(|e| (e.path().parent().unwrap().to_owned(), e.file_name()))
                     .collect::<std::collections::HashMap<_, _>>();
-                println!("{es:?}");
+                println!("{} {es:?}", std::env::var("PATH")?);
                 if let Some(executable) = executables
                     .iter()
                     .find(|exec| exec.file_name() == command_name)
