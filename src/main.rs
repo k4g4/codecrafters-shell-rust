@@ -31,6 +31,8 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
                 for entry in read_dir {
                     execs.push(entry?);
                 }
+            } else {
+                panic!("AAAA");
             }
         }
         execs
