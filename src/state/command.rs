@@ -71,11 +71,11 @@ impl Command {
             )))),
 
             _ => {
-                for path in std::env::var("PATH")?.split(':') {
+                for path in std::env::var("PATH")?.split(':').take(2) {
                     if let Ok(read_dir) = std::fs::read_dir(path) {
                         println!("{path} is ok");
                         for entry in read_dir {
-                            print!("{} ", entry?.file_name().to_string_lossy());
+                            print!("{} ", entry?.path().display());
                         }
                         println!();
                     } else {
