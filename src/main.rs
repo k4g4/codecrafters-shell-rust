@@ -30,7 +30,7 @@ fn repl(Args {}: Args) -> anyhow::Result<()> {
         .flatten()
         .collect::<Result<_, _>>()?;
     for exec in &executables {
-        println!("{}", exec.file_name().to_string_lossy());
+        eprintln!("{}", exec.file_name().to_string_lossy());
     }
 
     let mut state = State::new(executables);
