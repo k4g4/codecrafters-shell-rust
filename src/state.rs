@@ -56,7 +56,7 @@ impl State {
                     Type::None => {}
                 },
 
-                Command::Path(path, args) => writeln!(
+                Command::Path(path, args) => write!(
                     writer,
                     "{}",
                     String::from_utf8_lossy(
